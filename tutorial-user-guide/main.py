@@ -550,6 +550,7 @@ def update_item(id: str, item: Item):
 #Body - Updates
 
 # Update replacing with PUT
+"""
 from typing import List, Optional
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
@@ -588,3 +589,4 @@ async def update_item(item_id: str, item: Item):
     updated_item = stored_item_model.copy(update=update_data)
     items[item_id] = jsonable_encoder(updated_item)
     return updated_item
+"""

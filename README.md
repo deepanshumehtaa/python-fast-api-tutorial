@@ -269,3 +269,34 @@
         ├── main.py
         ├── models.py
         └── schemas.py
+
+# 26 Bigger Applications - Multiple Files
+    .
+    ├── app
+    │   ├── __init__.py
+    │   ├── main.py
+    │   ├── dependencies.py
+    │   └── routers
+    │   │   ├── __init__.py
+    │   │   ├── items.py
+    │   │   └── users.py
+    │   └── internal
+    │       ├── __init__.py
+    │       └── admin.py
+
+# 27. Background Tasks
+    + You can define background tasks to be run after returning a response.
+    + This is useful for operations that need to happen after a request, but that the client doesn't really have to be waiting for the operation to complete before receiving the response.
+    Example:
+        . Email notifications sent after performing an action:
+        . As connecting to an email server and sending an email tends to be "slow" (several seconds), you can return the response right away and send the email notification in the background.
+        . Processing data:
+            For example, let's say you receive a file that must go through a slow process, you can return a response of "Accepted" (HTTP 202) and process it in the background.
+
+# 28. Static Files
+    + "Mounting" means adding a complete "independent" application in a specific path, that then takes care of handling all the sub-paths.
+    + This is different from using an APIRouter as a mounted application is completely independent. The OpenAPI and docs from your main application won't include anything from the mounted application, etc.
+
+    + The first "/static" refers to the sub-path this "sub-application" will be "mounted" on. So, any path that starts with "/static" will be handled by it.
+    + The directory="static" refers to the name of the directory that contains your static files.
+    + The name="static" gives it a name that can be used internally by FastAPI.

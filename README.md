@@ -300,3 +300,82 @@
     + The first "/static" refers to the sub-path this "sub-application" will be "mounted" on. So, any path that starts with "/static" will be handled by it.
     + The directory="static" refers to the name of the directory that contains your static files.
     + The name="static" gives it a name that can be used internally by FastAPI.
+
+# Advanced User Guide
+# Return a Response Directly
+    + When you create a FastAPI path operation you can normally return any data from it: a dict, a list, a Pydantic model, a database model, etc.
+    + By default, FastAPI would automatically convert that return value to JSON using the jsonable_encoder explained in JSON Compatible Encoder.
+    + Then, behind the scenes, it would put that JSON-compatible data (e.g. a dict) inside of a JSONResponse that would be used to send the response to the client.
+    + But you can return a JSONResponse directly from your path operations.
+    + It might be useful, for example, to return custom headers or cookies.
+
+# Custom Response - HTML, Stream, File, others
+    + By default, FastAPI will return the responses using JSONResponse.
+    + You can override it by returning a Response directly
+    + But if you return a Response directly, the data won't be automatically converted, and the documentation won't be automatically generated (for example, including the specific "media type", in the HTTP header Content-Type as part of the generated OpenAPI).
+    + But you can also declare the Response that you want to be used, in the path operation decorator.
+    + The contents that you return from your path operation function will be put inside of that Response.
+    + And if that Response has a JSON media type (application/json), like is the case with the JSONResponse and UJSONResponse, the data you return will be automatically converted (and filtered) with any Pydantic response_model that you declared in the path operation decorator.
+
+# Advanced Dependencies
+    + A "callable" instance
+        . In Python there's a way to make an instance of a class a "callable".
+        . Not the class itself (which is already a callable), but an instance of that class.
+        . To do that, we declare a method __call__:
+            def __call__(self, q: str = ""):
+                if q:
+                    return self.fixed_content in q
+                return False
+
+# Advanced Security
+    + OAuth2 scopes
+        . This would allow you to have a more fine-grained permission system, following the OAuth2 standard, integrated into your OpenAPI application (and the API docs).
+
+        . OAuth2 with scopes is the mechanism used by many big authentication providers, like Facebook, Google, GitHub, Microsoft, Twitter, etc. They use it to provide specific permissions to users and applications.
+
+        . Every time you "log in with" Facebook, Google, GitHub, Microsoft, Twitter, that application is using OAuth2 with scopes.
+    + OAuth2 scopes and OpenAPI
+        . The OAuth2 specification defines "scopes" as a list of strings separated by spaces.
+        . The content of each of these strings can have any format, but should not contain spaces.
+        . In OpenAPI (e.g. the API docs), you can define "security schemes".
+
+# HTTP Basic Auth
+    + In HTTP Basic Auth, the application expects a header that contains a username and a password.
+
+    + If it doesn't receive it, it returns an HTTP 401 "Unauthorized" error.
+
+    + And returns a header WWW-Authenticate with a value of Basic, and an optional realm parameter.
+
+    + That tells the browser to show the integrated prompt for a username and password.
+
+    + Then, when you type that username and password, the browser sends them in the header automatically.
+
+# Using Dataclasses
+    + So, even with the code above that doesn't use Pydantic explicitly, FastAPI is using Pydantic to convert those standard dataclasses to Pydantic's own flavor of dataclasses.
+
+    + And of course, it supports the same:
+        . data validation
+        . data serialization
+        . data documentation, etc.
+    This works the same way as with Pydantic models. And it is actually achieved in the same way underneath, using Pydantic.
+
+# Advanced Middleware
+    + Adding ASGI middlewares
+        . As FastAPI is based on Starlette and implements the ASGI specification, you can use any ASGI middleware.
+
+        . A middleware doesn't have to be made for FastAPI or Starlette to work, as long as it follows the ASGI spec.
+
+        . In general, ASGI middlewares are classes that expect to receive an ASGI app as the first argument.
+    
+    + Integrated middlewares
+        . HTTPSRedirectMiddleware
+        . TrustedHostMiddleware
+        . GZipMiddleware
+
+# SQL (Relational) Databases with Peewee
+    + Peewee for async
+        . Peewee was not designed for async frameworks, or with them in mind.
+        . Peewee has some heavy assumptions about its defaults and about how it should be used.
+        . If you are developing an application with an older non-async framework, and can work with all its defaults, it can be a great tool.
+        . But if you need to change some of the defaults, support more than one predefined database, work with an async framework (like FastAPI), etc, you will need to add quite some complex extra code to override those defaults.
+        . Nevertheless, it's possible to do it, and here you'll see exactly what code you have to add to be able to use Peewee with FastAPI.
